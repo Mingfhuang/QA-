@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FY2526 QA年中茶话会 - 匿名问卷</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            padding: 15px; /* 移动端减少内边距 */
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px; /* 移动端减少内边距 */
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        .header-img {
+            width: 100%;
+            height: auto; /* 改为自适应高度，避免图片变形 */
+            max-height: 200px; /* 限制最大高度，适配手机 */
+            object-fit: contain;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .title {
+            font-size: 20px; /* 移动端缩小标题字体 */
+            font-weight: bold;
+            color: #333;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .question p {
+            font-size: 15px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 10px;
+            line-height: 1.4; /* 增加行高，手机阅读更舒适 */
+        }
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 100px; /* 移动端增加输入框最小高度 */
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #409eff;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px; /* 移动端缩小按钮间距 */
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap; /* 适配小屏手机，按钮换行 */
+        }
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1; /* 按钮自适应宽度 */
+            min-width: 120px; /* 限制按钮最小宽度 */
+        }
+        #submitBtn {
+            background-color: #409eff;
+            color: white;
+        }
+        #exportBtn {
+            background-color: #67c23a;
+            color: white;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .tip {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #999;
+            line-height: 1.4;
+        }
+        .success {
+            color: #67c23a;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- 已替换为你提供的本地图片路径 -->
+            <img src="C:\Users\huang.m.13\OneDrive - Procter and Gamble\Documents\Braun QA\LEAP.png" alt="QA年中茶话会" class="header-img">
+            <h1 class="title">FY2526 QA年中茶话会 - 匿名问卷</h1>
+        </div>
+
+        <form id="questionnaireForm">
+            <div class="question">
+                <p>1. 请你列举部门在上半年里做的比较好的地方?(请列举两点)</p>
+                <textarea name="q1" placeholder="示例：1. 项目协作效率高；2. 新人培训体系完善..." required></textarea>
+            </div>
+
+            <div class="question">
+                <p>2. 请你列举部门在上半年里做的有待加强的地方?(请列举一点)</p>
+                <textarea name="q2" placeholder="示例：跨部门沟通的及时性不足..." required></textarea>
+            </div>
+
+            <div class="question">
+                <p>3. 你希望部门在下半年改善的点?(请列举一点)</p>
+                <textarea name="q3" placeholder="示例：增加技术分享会的频次..." required></textarea>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" id="submitBtn">提交问卷</button>
+                <button type="button" id="exportBtn">导出所有结果</button>
+            </div>
+            <p class="success" id="successTip">提交成功！感谢你的宝贵意见~</p>
+        </form>
+        <p class="tip">本问卷完全匿名，数据仅保存在本地，导出后可清除</p>
+    </div>
+
+    <script>
+        // 存储问卷数据
+        function saveData(data) {
+            let list = JSON.parse(localStorage.getItem('qaQuestionnaire') || '[]');
+            list.push(data);
+            localStorage.setItem('qaQuestionnaire', JSON.stringify(list));
+        }
+
+        // 提交问卷
+        document.getElementById('questionnaireForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const q1 = this.q1.value.trim();
+            const q2 = this.q2.value.trim();
+            const q3 = this.q3.value.trim();
+
+            if (!q1 || !q2 || !q3) {
+                alert('请填写所有问题后再提交！');
+                return;
+            }
+
+            // 保存数据
+            saveData({
+                time: new Date().toLocaleString(),
+                q1: q1,
+                q2: q2,
+                q3: q3
+            });
+
+            // 清空表单
+            this.reset();
+            // 显示成功提示
+            document.getElementById('successTip').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('successTip').style.display = 'none';
+            }, 3000);
+        });
+
+        // 导出CSV
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            const list = JSON.parse(localStorage.getItem('qaQuestionnaire') || '[]');
+            if (list.length === 0) {
+                alert('暂无问卷数据可导出！');
+                return;
+            }
+
+            // 构造CSV内容（处理逗号转义，避免CSV格式错误）
+            let csvContent = "时间,上半年做得好的地方(两点),有待加强的地方(一点),下半年希望改善的点(一点)\n";
+            list.forEach(item => {
+                // 对包含逗号的内容加引号，避免CSV列错位
+                const escapeComma = (str) => str.includes(',') ? `"${str}"` : str;
+                csvContent += `${escapeComma(item.time)},${escapeComma(item.q1)},${escapeComma(item.q2)},${escapeComma(item.q3)}\n`;
+            });
+
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `FY2526_QA茶话会问卷结果_${new Date().toLocaleDateString()}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    </script>
+</body>
+</html>
